@@ -15,17 +15,8 @@ echo "Deploying to ${HOST}..."
 scp "${SCRIPT_DIR}/IDENTITY.md" "root@${HOST}:${REMOTE_WORKSPACE}/IDENTITY.md"
 scp "${SCRIPT_DIR}"/skills/*.md "root@${HOST}:${REMOTE_WORKSPACE}/skills/"
 
-# Remove old skill files that no longer exist locally
-ssh "root@${HOST}" bash -s <<'REMOTE'
-cd /home/zeroclaw/.zeroclaw/workspace/skills
-for f in *.md; do
-    [ -f "$f" ] || continue
-    echo "  checking $f"
-done
-# Clean up known old files
-rm -f bitcoin-research.md research-coordinator.md saas-research.md
-chown -R zeroclaw:zeroclaw /home/zeroclaw/.zeroclaw/
-REMOTE
+# Fix ownership
+ssh "root@${HOST}" "chown -R zeroclaw:zeroclaw /home/zeroclaw/.zeroclaw/"
 
 echo ""
 echo "Files deployed. Restarting zeroclaw service..."
