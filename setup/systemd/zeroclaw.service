@@ -1,0 +1,39 @@
+[Unit]
+Description=ZeroClaw AI Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zeroclaw
+Group=zeroclaw
+ExecStart=/usr/local/bin/zeroclaw daemon
+Restart=on-failure
+RestartSec=10
+WorkingDirectory=/home/zeroclaw/.zeroclaw/workspace
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/zeroclaw/.zeroclaw /home/zeroclaw
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=zeroclaw
+
+[Install]
+WantedBy=multi-user.target

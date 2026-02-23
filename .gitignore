@@ -1,0 +1,32 @@
+# Secrets and credentials
+.secret_key
+auth-profiles.json
+*.pem
+*.key
+
+# Config files with secrets (use config.example.toml instead)
+config.toml
+
+# Runtime state
+state/
+*.db
+*.db-shm
+*.db-wal
+
+# Environment files
+.env
+.env.local
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

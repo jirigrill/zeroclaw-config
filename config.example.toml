@@ -1,0 +1,35 @@
+# ZeroClaw Configuration Template
+# Copy this to ~/.zeroclaw/config.toml and fill in your API keys
+
+# API Configuration
+api_key = "YOUR_OPENROUTER_API_KEY"  # Get from https://openrouter.ai/keys
+default_provider = "openrouter"
+default_model = "perplexity/sonar"
+default_temperature = 0.7
+
+[memory]
+backend = "sqlite"
+auto_save = true
+
+[autonomy]
+level = "supervised"  # Options: readonly, supervised, full
+workspace_only = true
+allowed_commands = [
+    "curl", "grep", "cat", "head", "tail", "ls", "find",
+    "jq", "python3", "wc", "sort", "uniq", "date", "echo", "pwd"
+]
+forbidden_paths = [
+    "/etc", "/root/.ssh", "/usr", "/bin", "/sbin",
+    "/boot", "/dev", "/proc", "/sys"
+]
+max_actions_per_hour = 30
+max_cost_per_day_cents = 500
+require_approval_for_medium_risk = true
+block_high_risk_commands = true
+
+[channels_config]
+cli = false
+
+[channels_config.telegram]
+bot_token = "YOUR_TELEGRAM_BOT_TOKEN"  # Get from @BotFather
+allowed_users = ["YOUR_TELEGRAM_USER_ID"]  # Your Telegram user ID
