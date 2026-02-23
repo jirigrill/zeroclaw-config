@@ -6,7 +6,7 @@ Configuration files for a ZeroClaw AI agent deployed at nofiat.me. This is NOT a
 
 Multi-model orchestrator pattern via OpenRouter:
 
-- **Orchestrator** (IDENTITY.md): `google/gemini-2.5-flash-thinking` — routes user intent, validates researcher output, iterates if quality is insufficient
+- **Orchestrator** (IDENTITY.md): `google/gemini-2.5-flash` — routes user intent, validates researcher output, iterates if quality is insufficient
 - **Researchers** (skills/): each skill declares a `model_hint` in YAML frontmatter that maps to a `[[model_routes]]` entry in config
 
 | Skill file | model_hint | Model |

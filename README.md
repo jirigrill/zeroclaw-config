@@ -7,7 +7,7 @@ Personal configuration for my ZeroClaw AI agent running on nofiat.me
 This repository contains the sanitized configuration files for my [ZeroClaw](https://github.com/openagen/zeroclaw) autonomous AI assistant. ZeroClaw is a lightweight (~5MB RAM), Rust-based AI infrastructure that can be deployed anywhere.
 
 **Deployment:** DigitalOcean droplet (164.92.236.31)
-**Orchestrator:** Gemini 2.5 Flash (thinking) via OpenRouter
+**Orchestrator:** Gemini 2.5 Flash via OpenRouter
 **Researchers:** Perplexity Sonar variants via OpenRouter
 **Channels:** Telegram bot
 **Domain:** nofiat.me
@@ -36,7 +36,7 @@ User message
     │
     ▼
 ┌─────────────────────────────┐
-│  Orchestrator (IDENTITY.md) │  ← google/gemini-2.5-flash-thinking
+│  Orchestrator (IDENTITY.md) │  ← google/gemini-2.5-flash
 │  - Routes user intent       │
 │  - Validates output quality │
 │  - Iterates if gaps found   │
@@ -57,7 +57,7 @@ User message
 
 | Route Hint     | Model                              | Purpose                       |
 |----------------|------------------------------------|-------------------------------|
-| (default)      | google/gemini-2.5-flash-thinking   | Orchestration, validation     |
+| (default)      | google/gemini-2.5-flash   | Orchestration, validation     |
 | web-research   | perplexity/sonar-pro-search        | Generic multi-step research   |
 | deep-research  | perplexity/sonar-deep-research     | Deep autonomous research (BTC)|
 | analytical     | perplexity/sonar-reasoning         | Reasoning + web (SaaS)        |
@@ -145,7 +145,7 @@ sudo journalctl -u zeroclaw -f
 ### Key Settings
 
 **Model Selection:**
-- Orchestrator: `google/gemini-2.5-flash-thinking` — fast reasoning for routing and validation
+- Orchestrator: `google/gemini-2.5-flash` — fast reasoning for routing and validation
 - Researchers: Perplexity Sonar variants — each optimized for different research patterns
 - All models accessed via OpenRouter (single API key)
 
