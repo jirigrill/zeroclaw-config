@@ -3,9 +3,24 @@
 
 # API Configuration
 api_key = "YOUR_OPENROUTER_API_KEY"  # Get from https://openrouter.ai/keys
-default_provider = "openrouter"
-default_model = "perplexity/sonar"
+default_provider = "openrouter"      # google models also routed via openrouter
+default_model = "google/gemini-2.5-flash-thinking"
 default_temperature = 0.7
+
+# Model routes — skill frontmatter `model_hint` maps to these
+# Orchestrator (default model) delegates to researchers via hints
+
+[[model_routes]]
+hint = "web-research"
+model = "perplexity/sonar-pro-search"
+
+[[model_routes]]
+hint = "deep-research"
+model = "perplexity/sonar-deep-research"
+
+[[model_routes]]
+hint = "analytical"
+model = "perplexity/sonar-reasoning"
 
 [memory]
 backend = "sqlite"

@@ -7,7 +7,8 @@ Personal configuration for my ZeroClaw AI agent running on nofiat.me
 This repository contains the sanitized configuration files for my [ZeroClaw](https://github.com/openagen/zeroclaw) autonomous AI assistant. ZeroClaw is a lightweight (~5MB RAM), Rust-based AI infrastructure that can be deployed anywhere.
 
 **Deployment:** DigitalOcean droplet (164.92.236.31)
-**Model:** Perplexity Sonar via OpenRouter
+**Orchestrator:** Gemini 2.5 Flash (thinking) via OpenRouter
+**Researchers:** Perplexity Sonar variants via OpenRouter
 **Channels:** Telegram bot
 **Domain:** nofiat.me
 
@@ -16,15 +17,52 @@ This repository contains the sanitized configuration files for my [ZeroClaw](htt
 ```
 zeroclaw-config/
 ├── config.example.toml          # Configuration template (fill in your API keys)
-├── IDENTITY.md                  # Agent personality and behavior rules
-├── skills/                      # Custom skill definitions
-│   ├── bitcoin-research.md      # Bitcoin/Lightning ecosystem research
-│   ├── saas-research.md         # Micro-SaaS opportunity research
-│   └── research-coordinator.md  # Structured research protocol
+├── IDENTITY.md                  # Orchestrator behavior and routing rules
+├── skills/                      # Researcher skill definitions
+│   ├── generic-researcher.md    # Multi-source web research (sonar-pro-search)
+│   ├── bitcoin-showcase.md      # BTC/Lightning project discovery (sonar-deep-research)
+│   └── saas-opportunity.md      # AI-resistant SaaS ideas (sonar-reasoning)
 └── setup/
     └── systemd/
         └── zeroclaw.service     # Systemd service configuration
 ```
+
+## Architecture
+
+The agent uses a multi-model architecture where an orchestrator delegates to specialized researchers:
+
+```
+User message
+    │
+    ▼
+┌─────────────────────────────┐
+│  Orchestrator (IDENTITY.md) │  ← google/gemini-2.5-flash-thinking
+│  - Routes user intent       │
+│  - Validates output quality │
+│  - Iterates if gaps found   │
+│  - Presents final result    │
+└──────────┬──────────────────┘
+           │ delegates to
+           ▼
+┌──────────────────────────────────────────────────────┐
+│  Researcher Skills                                   │
+│                                                      │
+│  generic-researcher    → perplexity/sonar-pro-search │
+│  bitcoin-showcase      → perplexity/sonar-deep-research │
+│  saas-opportunity      → perplexity/sonar-reasoning  │
+└──────────────────────────────────────────────────────┘
+```
+
+### Model Routes
+
+| Route Hint     | Model                              | Purpose                       |
+|----------------|------------------------------------|-------------------------------|
+| (default)      | google/gemini-2.5-flash-thinking   | Orchestration, validation     |
+| web-research   | perplexity/sonar-pro-search        | Generic multi-step research   |
+| deep-research  | perplexity/sonar-deep-research     | Deep autonomous research (BTC)|
+| analytical     | perplexity/sonar-reasoning         | Reasoning + web (SaaS)        |
+
+Skills declare their model via `model_hint` in YAML frontmatter. The orchestrator runs on the default model and delegates to skills, which run on their hinted model.
 
 ## Quick Start
 
@@ -77,7 +115,7 @@ zeroclaw-config/
 
 5. **Test the agent:**
    ```bash
-   zeroclaw agent -m "Hello, test message"
+   zeroclaw agent -m "Find me a Bitcoin project to showcase"
    ```
 
 ### Systemd Service Setup (Production)
@@ -107,8 +145,9 @@ sudo journalctl -u zeroclaw -f
 ### Key Settings
 
 **Model Selection:**
-- Using `perplexity/sonar` for fast, web-connected research
-- Alternative: `anthropic/claude-sonnet-4-6` for complex reasoning
+- Orchestrator: `google/gemini-2.5-flash-thinking` — fast reasoning for routing and validation
+- Researchers: Perplexity Sonar variants — each optimized for different research patterns
+- All models accessed via OpenRouter (single API key)
 
 **Autonomy Level:**
 - `supervised`: Requires approval for medium-risk actions (recommended)
@@ -121,49 +160,41 @@ sudo journalctl -u zeroclaw -f
 - Forbidden paths protection (/etc, /root, /usr, etc.)
 - Rate limiting: 30 actions/hour, $5/day max cost
 
-### Custom Skills
+### Researcher Skills
 
-**bitcoin-research.md**
-- Monitors Bitcoin/Lightning developer activity
-- Tracks funding opportunities (OpenSats, Spiral)
-- Focuses on Rust projects (LDK, BDK, rust-bitcoin)
+**generic-researcher.md** (sonar-pro-search)
+- Multi-source web research on any topic
+- Self-validation: 2+ sources per finding, gap reporting
+- Iterates on failed sources before reporting gaps
 
-**saas-research.md**
-- Identifies micro-SaaS opportunities
-- Analyzes market signals and pain points
-- Tracks validated product ideas
+**bitcoin-showcase.md** (sonar-deep-research)
+- Finds buildable Bitcoin/Lightning showcase projects (~1 month scope)
+- Expanded sources: 12+ project repos, developer profiles, funding signals
+- Feasibility filter: Rust path, real gap, showcase-worthy, solo-buildable
 
-**research-coordinator.md**
-- Handles structured research briefs
-- Systematic multi-source research protocol
-- Returns actionable, developer-focused findings
+**saas-opportunity.md** (sonar-reasoning)
+- AI-resistant micro-SaaS opportunity discovery
+- Defensibility filter: data moat, integration depth, domain expertise, network effects
+- Fixed sources (replaced broken MicroAcquire, IndieHackers endpoints)
 
 ## Usage Examples
 
 ### Via Telegram
-Just message your bot - it will respond using the configured model and skills.
+Message your bot — the orchestrator routes to the appropriate researcher skill.
 
 ### Via CLI
 ```bash
-# Single message
-zeroclaw agent -m "What Bitcoin projects need Rust developers?"
+# Bitcoin showcase project discovery
+zeroclaw agent -m "Find me a Bitcoin project to showcase my Rust skills"
+
+# SaaS opportunity research
+zeroclaw agent -m "What micro-SaaS ideas have real defensibility right now?"
+
+# General research
+zeroclaw agent -m "Compare Lightning implementations for mobile wallets"
 
 # Interactive session
 zeroclaw agent --interactive
-```
-
-### Research Brief Format
-```
-RESEARCH BRIEF
-Topic: Silent Payments implementation
-Context: BIP352 needs scanning infrastructure
-Focus areas:
-  1. Existing implementations and their limitations
-  2. Open issues and contribution opportunities
-  3. Funding availability
-Sources: GitHub / Delving / Optech
-Depth: deep-dive
-Output: detailed
 ```
 
 ## Monitoring & Maintenance
@@ -194,22 +225,14 @@ sudo nano /home/zeroclaw/.zeroclaw/config.toml
 sudo systemctl restart zeroclaw
 ```
 
-### Switch Models
-Edit `/home/zeroclaw/.zeroclaw/config.toml`:
-```toml
-default_model = "anthropic/claude-sonnet-4-6"  # For complex reasoning
-# default_model = "perplexity/sonar"           # For fast research
-```
-Then restart the service.
-
 ## Security Notes
 
-⚠️ **Never commit these files:**
+Never commit these files:
 - `config.toml` (contains API keys)
 - `.secret_key` (encryption key)
 - `auth-profiles.json` (authentication data)
 
-✅ **Safe to share:**
+Safe to share:
 - `config.example.toml` (template without secrets)
 - All skill files (`*.md`)
 - `IDENTITY.md`
