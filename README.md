@@ -9,7 +9,8 @@ This repository contains the sanitized configuration files for my [ZeroClaw](htt
 **Deployment:** DigitalOcean droplet (164.92.236.31)
 **Orchestrator:** Gemini 2.5 Flash via OpenRouter
 **Researchers:** Perplexity Sonar variants via OpenRouter
-**Channels:** Telegram bot
+**Channels:** Telegram bot + IRC (Ergo, localhost via SSH tunnel)
+**IRC client:** [Halloy](https://halloy.squidowl.org/) (`brew install halloy`)
 **Domain:** nofiat.me
 
 ## Repository Structure
@@ -22,9 +23,14 @@ zeroclaw-config/
 │   ├── generic-researcher.md    # Multi-source web research (sonar-pro-search)
 │   ├── bitcoin-showcase.md      # BTC/Lightning project discovery (sonar-deep-research)
 │   └── saas-opportunity.md      # AI-resistant SaaS ideas (sonar-reasoning)
+├── deploy.sh                    # Deploy skills and identity to production server
 └── setup/
-    └── systemd/
-        └── zeroclaw.service     # Systemd service configuration
+    ├── systemd/
+    │   └── zeroclaw.service     # Systemd service for ZeroClaw
+    └── ergo/
+        ├── install.sh           # Install Ergo IRC server on server
+        ├── register-accounts.sh # Register IRC user accounts
+        └── ergo.service         # Systemd service for Ergo
 ```
 
 ## Architecture
@@ -178,6 +184,12 @@ sudo journalctl -u zeroclaw -f
 - Fixed sources (replaced broken MicroAcquire, IndieHackers endpoints)
 
 ## Usage Examples
+
+### Via IRC (Halloy)
+1. Open SSH tunnel: `ssh -N -L 6697:127.0.0.1:6697 nofiat-droplet`
+2. Connect Halloy to `127.0.0.1:6697`, SASL auth with your IRC credentials, disable cert verification
+3. Join `#bitcoin`, `#saas`, or `#research` — each channel is a separate conversation context
+4. Message zeroclaw bot directly or in channel
 
 ### Via Telegram
 Message your bot — the orchestrator routes to the appropriate researcher skill.
