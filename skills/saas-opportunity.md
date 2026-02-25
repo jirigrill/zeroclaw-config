@@ -1,6 +1,6 @@
 ---
 name: saas-opportunity
-description: Research AI-resistant micro-SaaS opportunities with defensibility filtering. Focuses on ideas that can't be replicated in a weekend with AI tools.
+description: Research AI-resistant micro-SaaS opportunities (NOT Bitcoin-related). B2C preferred, solo-launchable, with defensibility filtering against AI disintermediation.
 model_hint: analytical
 ---
 
@@ -10,10 +10,11 @@ Finds validated micro-SaaS opportunities by analyzing market signals, then filte
 
 ## When to use
 
-- User wants to find a new income stream or product idea
+- User wants to find a new income stream or product idea (NOT Bitcoin-related)
 - User asks what micro-SaaS products are trending or gaining traction
 - User wants to validate a product idea against real market signals
 - Orchestrator delegates a SaaS/product research task
+- Preferably B2C ideas — no enterprise sales outreach required
 
 ## Research protocol
 
@@ -64,6 +65,27 @@ curl -s "https://api.github.com/search/repositories?q=stars:>100+pushed:>2025-01
 # Ask: "What SaaS tools are developers complaining about or requesting on Twitter/X this week?"
 ```
 
+### Freelance & marketplace demand
+```bash
+# Upwork — what people pay to have built reveals real pain points
+# Ask: "What are the most common recurring SaaS/automation job postings on Upwork this month?"
+
+# Fiverr — services people buy repeatedly are automation candidates
+# Ask: "What recurring software/automation/data services are popular on Fiverr?"
+
+# Freelancer.com — project requests reveal unmet needs
+# Ask: "What types of software projects are most requested on Freelancer.com recently?"
+
+# IndieHackers — what solo makers validate and ship successfully
+# Ask: "What are the most successful recent product launches on IndieHackers with revenue?"
+
+# AppSumo — what B2C/B2B SaaS gets early traction at launch
+# Ask: "What new SaaS products launched on AppSumo recently and which got the most reviews?"
+
+# G2 / Capterra — where users complain about existing tools (gap signals)
+# Ask: "What are the most common complaints in G2 reviews for [CATEGORY] software?"
+```
+
 ### Pricing validation
 ```bash
 # HN Who's Hiring (what companies need)
@@ -77,9 +99,9 @@ curl -s "https://lobste.rs/search.json?q=TOPIC&what=stories&order=newest" | pyth
 
 For each candidate idea, ask:
 
-> "Could a moderately technical person replicate this in a weekend using Claude Code or Codex?"
+> "Could the target customer solve this problem themselves using AI tools (ChatGPT, Claude, Cursor) instead of paying for your product?"
 
-If yes — skip it. The idea has no moat.
+If yes — the customer has no reason to pay. Skip it.
 
 An idea passes if it has 2+ of these defensibility factors:
 

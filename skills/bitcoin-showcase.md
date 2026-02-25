@@ -1,7 +1,7 @@
 ---
 name: bitcoin-showcase
 description: Find buildable Bitcoin/Lightning showcase projects demonstrating Rust + BTC competence. Targets ~1 month solo builds.
-model_hint: deep-research
+model_hint: analytical
 ---
 
 # Bitcoin Showcase Researcher
