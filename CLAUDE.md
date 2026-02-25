@@ -6,14 +6,14 @@ Configuration files for a ZeroClaw AI agent deployed at nofiat.me. This is NOT a
 
 Multi-model orchestrator pattern via OpenRouter:
 
-- **Orchestrator** (IDENTITY.md): `google/gemini-2.5-flash` — routes user intent, validates researcher output, iterates if quality is insufficient
+- **Orchestrator** (IDENTITY.md): `anthropic/claude-haiku-4.5` — strong calibration for validation, efficient routing
 - **Researchers** (skills/): each skill declares a `model_hint` in YAML frontmatter that maps to a `[[model_routes]]` entry in config
 
-| Skill file | model_hint | Model |
-|---|---|---|
-| generic-researcher.md | web-research | perplexity/sonar-pro-search |
-| bitcoin-showcase.md | deep-research | perplexity/sonar-deep-research |
-| saas-opportunity.md | analytical | perplexity/sonar-reasoning |
+| Skill file | model_hint | Model | Status |
+|---|---|---|---|
+| bitcoin-showcase.md | analytical | perplexity/sonar-reasoning | Active |
+| saas-opportunity.md | analytical | perplexity/sonar-reasoning | Active |
+| generic-researcher.md | web-research | — | **DISABLED** (file kept, route removed) |
 
 ## File conventions
 
@@ -21,13 +21,27 @@ Multi-model orchestrator pattern via OpenRouter:
 - **IDENTITY.md**: Orchestrator behavior — routing table, validation protocol, presentation rules. Plain text output, no markdown.
 - **skills/*.md**: Each skill has YAML frontmatter (`name`, `description`, `model_hint`) followed by Markdown body with research protocol, sources, and output format.
 
+## Credentials management
+
+On production server at `/home/zeroclaw/.zeroclaw/`:
+- **config.toml**: Live config with all API keys and passwords (not tracked in git, .gitignored)
+- **.env**: Backup of all credentials in `KEY=VALUE` format for future reference
+  - `ZEROCLAW_OPENROUTER_API_KEY`: OpenRouter API key
+  - `ZEROCLAW_TELEGRAM_BOT_TOKEN`: Telegram bot token
+  - `ZEROCLAW_TELEGRAM_USER_ID`: Your Telegram user ID
+  - `ZEROCLAW_IRC_NICK`: Your IRC nickname (for allowed_users)
+  - `ZEROCLAW_IRC_PASSWORD`: IRC SASL password
+
+Never commit config.toml, .env, or .secret_key — these contain live credentials.
+
 ## Key constraints
 
 - Skills must have valid YAML frontmatter with all three fields: `name`, `description`, `model_hint`
 - Every `model_hint` value must have a matching `[[model_routes]]` entry in config.example.toml
-- Every skill must be referenced in IDENTITY.md's routing table
+- Every **active** skill must be referenced in IDENTITY.md's routing table
+- Disabled skills: keep the file, but remove route from config and routing table
 - Skill output format is plain text with inline citations — no markdown
-- Never commit config.toml, .secret_key, or auth-profiles.json
+- Never commit `config.toml`, `.env`, `.secret_key`, or `auth-profiles.json` — these contain live credentials
 
 ## Verification after changes
 
