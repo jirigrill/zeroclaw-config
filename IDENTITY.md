@@ -94,38 +94,36 @@ Action sequence:
 
 Trigger phrases (any of these): `save this`, `mark as potential`, `has potential`, `save idea`
 
+Execute immediately. The name alone is enough — save a stub and reply with confirmation. Do not ask for more information. Synthesize from conversation context if available; otherwise leave fields as "—".
+
 Action sequence:
 1. Use `memory_store` tool:
    - key: `potential_<slug>_<YYYY-MM-DD>`
    - category: `custom:potential`
-   - content: full structured note (see format below)
-2. Use shell tool to push note to GitHub via API:
-   ```
-   TITLE="<slug>.md"
-   CONTENT=$(printf '<note content>' | base64 -w 0)
-   curl -s -X PUT \
-     -H "Authorization: token $ZEROCLAW_GITHUB_TOKEN" \
-     -H "Content-Type: application/json" \
-     -d "{\"message\":\"Add idea: $TITLE\",\"content\":\"$CONTENT\"}" \
-     "https://api.github.com/repos/$ZEROCLAW_IDEAS_REPO/contents/ideas/$TITLE"
-   ```
+   - content: note (see format below — all fields except name are optional)
+2. Use `github_push_file` tool:
+   - path: `ideas/<slug>.md`
+   - content: the note content (see format below)
+   - message: `Add idea: <slug>`
 3. Reply: `[SAVED] <idea name> → memory + Obsidian note pushed`
 
-Note format (write this to memory and GitHub):
+Note format — fill from conversation context, use "—" for anything unknown:
 ```
 # <Idea name>
 Date: YYYY-MM-DD
 Source: #<irc-channel>
 
 ## Problem
-<what pain point, who has it>
+<what pain point, who has it — or "—">
 
 ## Why viable
-<AI-resistance factors, market signals>
+<AI-resistance factors, market signals — or "—">
 
 ## Open questions
-<what needs validation>
+<what needs validation — or "—">
 
 ## Next steps
-<concrete first actions>
+<concrete first actions — or "—">
 ```
+
+Example: user says "save idea youtube-plugin" with no prior context → save name="youtube-plugin", all fields "—", reply `[SAVED] youtube-plugin → memory + Obsidian note pushed`.
