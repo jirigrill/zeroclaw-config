@@ -52,15 +52,15 @@ cli = false
 bot_token = "YOUR_TELEGRAM_BOT_TOKEN"  # Get from @BotFather
 allowed_users = ["YOUR_TELEGRAM_USER_ID"]  # Your Telegram user ID
 
-# IRC channel — connects to local Ergo server via SSH tunnel
-# Client: brew install halloy, then: ssh -N -L 6697:127.0.0.1:6697 nofiat-droplet
+# IRC channel — public Ergo server at irc.nofiat.me with Let's Encrypt TLS
+# Client: brew install halloy, connect to irc.nofiat.me:6697
 # See setup/ergo/ for server setup instructions
 [channels_config.irc]
-server = "127.0.0.1"
+server = "irc.nofiat.me"
 port = 6697
 nickname = "zeroclaw"
 username = "zeroclaw"
 channels = ["#research", "#bitcoin", "#saas"]  # one channel = one conversation context
 allowed_users = ["YOUR_IRC_NICK"]              # your registered IRC nickname
 sasl_password = "YOUR_ZEROCLAW_IRC_PASSWORD"   # registered via setup/ergo/register-accounts.sh
-verify_tls = false                             # self-signed cert, localhost only
+verify_tls = true                              # valid Let's Encrypt cert

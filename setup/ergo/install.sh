@@ -31,9 +31,23 @@ sed -i "s/name: ergo.test/name: nofiat.localhost/" /etc/ergo/ircd.conf
 # Patch: localhost TLS only (disable plaintext, restrict TLS to localhost)
 sed -i 's|"127.0.0.1:6667": # (loopback ipv4, localhost-only)|#&|' /etc/ergo/ircd.conf
 sed -i 's|"\[::1\]:6667":     # (loopback ipv6, localhost-only)|#&|' /etc/ergo/ircd.conf
-sed -i 's|":6697":|"127.0.0.1:6697":|' /etc/ergo/ircd.conf
-sed -i "s|cert: fullchain.pem|cert: /etc/ergo/tls.crt|" /etc/ergo/ircd.conf
-sed -i "s|key: privkey.pem|key: /etc/ergo/tls.key|" /etc/ergo/ircd.conf
+sed -i 's|":6697":|"0.0.0.0:6697":|' /etc/ergo/ircd.conf
+sed -i "s|cert: fullchain.pem|cert: /etc/letsencrypt/live/irc.nofiat.me/fullchain.pem|" /etc/ergo/ircd.conf
+sed -i "s|key: privkey.pem|key: /etc/letsencrypt/live/irc.nofiat.me/privkey.pem|" /etc/ergo/ircd.conf
+
+# Harden: require SASL auth for all connections, disable self-registration
+python3 - << 'PYEOF'
+with open('/etc/ergo/ircd.conf', 'r') as f:
+    content = f.read()
+content = content.replace(
+    '        # if this is enabled, all clients must authenticate with SASL while connecting.\n        # WARNING: for a private server, you MUST set accounts.registration.enabled\n        # to false as well, in order to prevent non-administrators from registering\n        # accounts.\n        enabled: false',
+    '        # if this is enabled, all clients must authenticate with SASL while connecting.\n        # WARNING: for a private server, you MUST set accounts.registration.enabled\n        # to false as well, in order to prevent non-administrators from registering\n        # accounts.\n        enabled: true'
+)
+with open('/etc/ergo/ircd.conf', 'w') as f:
+    f.write(content)
+PYEOF
+# Line 414: disable open account registration
+sed -i '414s/enabled: true/enabled: false/' /etc/ergo/ircd.conf
 # Patch: datastore path
 sed -i "s|path: ircd.db|path: /var/lib/ergo/ircd.db|" /etc/ergo/ircd.conf
 
@@ -46,11 +60,11 @@ systemctl enable ergo
 systemctl start ergo
 
 echo ""
-echo "Ergo running on 127.0.0.1:6697 (TLS, localhost only)"
+echo "Ergo running on 0.0.0.0:6697 (TLS, Let's Encrypt cert for irc.nofiat.me)"
 echo ""
-echo "Next: register IRC accounts"
-echo "  1. Register your user:     run setup/ergo/register-accounts.sh"
-echo "  2. Add IRC to ZeroClaw:    add [channels_config.irc] to config.toml (see config.example.toml)"
-echo "  3. Connect from macOS:     brew install halloy, then SSH tunnel:"
-echo "     ssh -N -L 6697:127.0.0.1:6697 nofiat-droplet"
-echo "     Connect Halloy to 127.0.0.1:6697, disable cert verification"
+echo "Next: register IRC accounts and get TLS cert"
+echo "  1. Get cert:               certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.cloudflare.ini -d irc.nofiat.me"
+echo "  2. Add renewal hook:       cp setup/ergo/reload-ergo.sh /etc/letsencrypt/renewal-hooks/deploy/"
+echo "  3. Register your user:     run setup/ergo/register-accounts.sh"
+echo "  4. Add IRC to ZeroClaw:    add [channels_config.irc] to config.toml (see config.example.toml)"
+echo "  5. Connect from macOS:     brew install halloy, connect to irc.nofiat.me:6697"

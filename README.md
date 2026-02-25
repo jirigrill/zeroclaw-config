@@ -9,7 +9,7 @@ This repository contains the sanitized configuration files for my [ZeroClaw](htt
 **Deployment:** DigitalOcean droplet (164.92.236.31)
 **Orchestrator:** Gemini 2.5 Flash via OpenRouter
 **Researchers:** Perplexity Sonar variants via OpenRouter
-**Channels:** Telegram bot + IRC (Ergo, localhost via SSH tunnel)
+**Channels:** Telegram bot + IRC (Ergo at irc.nofiat.me:6697)
 **IRC client:** [Halloy](https://halloy.squidowl.org/) (`brew install halloy`)
 **Domain:** nofiat.me
 
@@ -186,9 +186,8 @@ sudo journalctl -u zeroclaw -f
 ## Usage Examples
 
 ### Via IRC (Halloy)
-1. Open SSH tunnel: `ssh -N -L 6697:127.0.0.1:6697 nofiat-droplet`
-2. Connect Halloy to `127.0.0.1:6697`, SASL auth with your IRC credentials, disable cert verification
-3. Join `#bitcoin`, `#saas`, or `#research` — each channel is a separate conversation context
+1. Connect Halloy to `irc.nofiat.me:6697`, SASL auth with your IRC credentials
+2. Join `#bitcoin`, `#saas`, or `#research` — each channel is a separate conversation context
 4. Message zeroclaw bot directly or in channel
 
 ### Via Telegram
