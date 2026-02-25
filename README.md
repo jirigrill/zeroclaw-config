@@ -7,8 +7,8 @@ Personal configuration for my ZeroClaw AI agent running on nofiat.me
 This repository contains the sanitized configuration files for my [ZeroClaw](https://github.com/openagen/zeroclaw) autonomous AI assistant. ZeroClaw is a lightweight (~5MB RAM), Rust-based AI infrastructure that can be deployed anywhere.
 
 **Deployment:** DigitalOcean droplet (164.92.236.31)
-**Orchestrator:** Gemini 2.5 Flash via OpenRouter
-**Researchers:** Perplexity Sonar variants via OpenRouter
+**Orchestrator:** Claude Haiku 4.5 via OpenRouter
+**Researchers:** Perplexity Sonar Reasoning via OpenRouter
 **Channels:** Telegram bot + IRC (Ergo at irc.nofiat.me:6697)
 **IRC client:** [Halloy](https://halloy.squidowl.org/) (`brew install halloy`)
 **Domain:** nofiat.me
@@ -20,9 +20,9 @@ zeroclaw-config/
 ├── config.example.toml          # Configuration template (fill in your API keys)
 ├── IDENTITY.md                  # Orchestrator behavior and routing rules
 ├── skills/                      # Researcher skill definitions
-│   ├── generic-researcher.md    # Multi-source web research (sonar-pro-search)
-│   ├── bitcoin-showcase.md      # BTC/Lightning project discovery (sonar-deep-research)
-│   └── saas-opportunity.md      # AI-resistant SaaS ideas (sonar-reasoning)
+│   ├── generic-researcher.md    # [DISABLED] Multi-source web research
+│   ├── bitcoin-showcase.md      # BTC/Lightning project discovery (analytical)
+│   └── saas-opportunity.md      # AI-resistant SaaS ideas (analytical)
 ├── deploy.sh                    # Deploy skills and identity to production server
 └── setup/
     ├── systemd/
@@ -42,7 +42,7 @@ User message
     │
     ▼
 ┌─────────────────────────────┐
-│  Orchestrator (IDENTITY.md) │  ← google/gemini-2.5-flash
+│  Orchestrator (IDENTITY.md) │  ← anthropic/claude-haiku-4.5
 │  - Routes user intent       │
 │  - Validates output quality │
 │  - Iterates if gaps found   │
@@ -50,25 +50,23 @@ User message
 └──────────┬──────────────────┘
            │ delegates to
            ▼
-┌──────────────────────────────────────────────────────┐
-│  Researcher Skills                                   │
-│                                                      │
-│  generic-researcher    → perplexity/sonar-pro-search │
-│  bitcoin-showcase      → perplexity/sonar-deep-research │
-│  saas-opportunity      → perplexity/sonar-reasoning  │
-└──────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│  Researcher Skills                           │
+│                                              │
+│  bitcoin-showcase      ┐                     │
+│                        ├→ perplexity/sonar-reasoning
+│  saas-opportunity      ┘                     │
+└──────────────────────────────────────────────┘
 ```
 
 ### Model Routes
 
 | Route Hint     | Model                              | Purpose                       |
 |----------------|------------------------------------|-------------------------------|
-| (default)      | google/gemini-2.5-flash   | Orchestration, validation     |
-| web-research   | perplexity/sonar-pro-search        | Generic multi-step research   |
-| deep-research  | perplexity/sonar-deep-research     | Deep autonomous research (BTC)|
-| analytical     | perplexity/sonar-reasoning         | Reasoning + web (SaaS)        |
+| (default)      | anthropic/claude-haiku-4.5         | Orchestration, validation     |
+| analytical     | perplexity/sonar-reasoning         | Structured reasoning (BTC + SaaS) |
 
-Skills declare their model via `model_hint` in YAML frontmatter. The orchestrator runs on the default model and delegates to skills, which run on their hinted model.
+Skills declare their model via `model_hint` in YAML frontmatter. The orchestrator runs on the default model (Claude Haiku 4.5 for calibration/consistency) and delegates to skills, which run on their hinted model.
 
 ## Quick Start
 
@@ -151,8 +149,8 @@ sudo journalctl -u zeroclaw -f
 ### Key Settings
 
 **Model Selection:**
-- Orchestrator: `google/gemini-2.5-flash` — fast reasoning for routing and validation
-- Researchers: Perplexity Sonar variants — each optimized for different research patterns
+- Orchestrator: `anthropic/claude-haiku-4.5` — strong calibration for validation, efficient routing
+- Researchers: `perplexity/sonar-reasoning` — structured analytical reasoning for both BTC and SaaS discovery
 - All models accessed via OpenRouter (single API key)
 
 **Autonomy Level:**
@@ -168,20 +166,16 @@ sudo journalctl -u zeroclaw -f
 
 ### Researcher Skills
 
-**generic-researcher.md** (sonar-pro-search)
-- Multi-source web research on any topic
-- Self-validation: 2+ sources per finding, gap reporting
-- Iterates on failed sources before reporting gaps
-
-**bitcoin-showcase.md** (sonar-deep-research)
+**bitcoin-showcase.md** (sonar-reasoning)
 - Finds buildable Bitcoin/Lightning showcase projects (~1 month scope)
 - Expanded sources: 12+ project repos, developer profiles, funding signals
 - Feasibility filter: Rust path, real gap, showcase-worthy, solo-buildable
 
 **saas-opportunity.md** (sonar-reasoning)
-- AI-resistant micro-SaaS opportunity discovery
+- AI-resistant micro-SaaS opportunity discovery (NOT Bitcoin-related)
+- B2C preferred, solo-launchable products only
 - Defensibility filter: data moat, integration depth, domain expertise, network effects
-- Fixed sources (replaced broken MicroAcquire, IndieHackers endpoints)
+- Sources include: HN, Reddit, Product Hunt, Upwork, Fiverr, IndieHackers, AppSumo, G2
 
 ## Usage Examples
 
