@@ -11,6 +11,7 @@ ExecStart=/usr/local/bin/zeroclaw daemon
 Restart=on-failure
 RestartSec=10
 WorkingDirectory=/home/zeroclaw/.zeroclaw/workspace
+EnvironmentFile=/home/zeroclaw/.zeroclaw/.env
 
 # Hardening
 NoNewPrivileges=true

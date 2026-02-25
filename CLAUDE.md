@@ -25,12 +25,19 @@ Multi-model orchestrator pattern via OpenRouter:
 
 On production server at `/home/zeroclaw/.zeroclaw/`:
 - **config.toml**: Live config with all API keys and passwords (not tracked in git, .gitignored)
-- **.env**: Backup of all credentials in `KEY=VALUE` format for future reference
+- **.env**: Active credentials file — loaded into the zeroclaw process via `EnvironmentFile=` in the systemd unit. Vars here are available to shell commands the agent runs (e.g. `curl` in topic commands).
   - `ZEROCLAW_OPENROUTER_API_KEY`: OpenRouter API key
   - `ZEROCLAW_TELEGRAM_BOT_TOKEN`: Telegram bot token
   - `ZEROCLAW_TELEGRAM_USER_ID`: Your Telegram user ID
   - `ZEROCLAW_IRC_NICK`: Your IRC nickname (for allowed_users)
   - `ZEROCLAW_IRC_PASSWORD`: IRC SASL password
+  - `ZEROCLAW_GITHUB_TOKEN`: Fine-grained PAT for pushing ideas to GitHub (Contents: Read and Write on ideas repo)
+  - `ZEROCLAW_IDEAS_REPO`: Target repo for saved ideas, e.g. `jirigrill/zeroclaw-ideas`
+
+**Which credentials go where:**
+- `ZEROCLAW_GITHUB_TOKEN` / `ZEROCLAW_IDEAS_REPO` — `.env` only (used in shell commands, not config.toml)
+- `bot_token`, `sasl_password`, `allowed_users` — **must stay in config.toml** — zeroclaw has no env var override for `[channels_config]` fields (confirmed in source)
+- `api_key`, `default_model` etc. — can be overridden via `ZEROCLAW_API_KEY`, `ZEROCLAW_MODEL` env vars (zeroclaw's `apply_env_overrides()` covers these)
 
 Never commit config.toml, .env, or .secret_key — these contain live credentials.
 

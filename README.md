@@ -4,7 +4,7 @@ Personal configuration for my ZeroClaw AI agent running on nofiat.me
 
 ## About
 
-This repository contains the sanitized configuration files for my [ZeroClaw](https://github.com/openagen/zeroclaw) autonomous AI assistant. ZeroClaw is a lightweight (~5MB RAM), Rust-based AI infrastructure that can be deployed anywhere.
+This repository contains the sanitized configuration files for my [ZeroClaw](https://github.com/zeroclaw-labs/zeroclaw) autonomous AI assistant. ZeroClaw is a lightweight (~5MB RAM), Rust-based AI infrastructure that can be deployed anywhere.
 
 **Deployment:** DigitalOcean droplet (164.92.236.31)
 **Orchestrator:** Claude Haiku 4.5 via OpenRouter
@@ -133,7 +133,14 @@ sudo mkdir -p /home/zeroclaw/.zeroclaw
 sudo cp -r ~/.zeroclaw/* /home/zeroclaw/.zeroclaw/
 sudo chown -R zeroclaw:zeroclaw /home/zeroclaw
 
-# Install service
+# Create .env with credentials (loaded into process via EnvironmentFile)
+cat > /home/zeroclaw/.zeroclaw/.env <<EOF
+ZEROCLAW_GITHUB_TOKEN=your_github_pat
+ZEROCLAW_IDEAS_REPO=owner/repo
+EOF
+chmod 600 /home/zeroclaw/.zeroclaw/.env
+
+# Install service (includes EnvironmentFile= directive pointing at .env)
 sudo cp setup/systemd/zeroclaw.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable zeroclaw
@@ -152,6 +159,10 @@ sudo journalctl -u zeroclaw -f
 - Orchestrator: `anthropic/claude-haiku-4.5` — strong calibration for validation, efficient routing
 - Researchers: `perplexity/sonar-reasoning` — structured analytical reasoning for both BTC and SaaS discovery
 - All models accessed via OpenRouter (single API key)
+
+**Integrations (`[integrations]`):**
+- `github_token`: Fine-grained PAT with Contents: Read and Write on the ideas repo. Set in `.env` as `ZEROCLAW_GITHUB_TOKEN` — not in config.toml.
+- `ideas_repo`: Target GitHub repo for saved ideas, e.g. `jirigrill/zeroclaw-ideas`. Set in `.env` as `ZEROCLAW_IDEAS_REPO`.
 
 **Autonomy Level:**
 - `supervised`: Requires approval for medium-risk actions (recommended)
@@ -182,7 +193,14 @@ sudo journalctl -u zeroclaw -f
 ### Via IRC (Halloy)
 1. Connect Halloy to `irc.nofiat.me:6697`, SASL auth with your IRC credentials
 2. Join `#bitcoin`, `#saas`, or `#research` — each channel is a separate conversation context
-4. Message zeroclaw bot directly or in channel
+3. Message zeroclaw bot directly or in channel
+
+**Topic commands** (special triggers that override normal routing):
+
+| Phrase | Action |
+|---|---|
+| `nuke this` / `dead end` / `not viable` / `archive this` | Archives current idea to memory, replies `[ARCHIVED] ...`, stops discussing it |
+| `save this` / `mark as potential` / `has potential` / `save idea` | Saves structured note to memory + pushes Markdown file to `zeroclaw-ideas` GitHub repo |
 
 ### Via Telegram
 Message your bot — the orchestrator routes to the appropriate researcher skill.
@@ -233,7 +251,8 @@ sudo systemctl restart zeroclaw
 ## Security Notes
 
 Never commit these files:
-- `config.toml` (contains API keys)
+- `config.toml` (contains API keys, bot tokens, passwords)
+- `.env` (contains credentials loaded at runtime)
 - `.secret_key` (encryption key)
 - `auth-profiles.json` (authentication data)
 
@@ -243,12 +262,15 @@ Safe to share:
 - `IDENTITY.md`
 - Systemd service file
 
+**Credential loading:** The systemd service loads `.env` via `EnvironmentFile=`, making those vars available to all shell commands the agent runs. Channel credentials (`bot_token`, `sasl_password`, `allowed_users`) have no env var override in zeroclaw — they must remain in `config.toml`.
+
 ## Resources
 
-- [ZeroClaw GitHub](https://github.com/openagen/zeroclaw)
+- [ZeroClaw GitHub](https://github.com/zeroclaw-labs/zeroclaw)
 - [OpenRouter Models](https://openrouter.ai/models)
-- [ZeroClaw Documentation](https://github.com/openagen/zeroclaw/tree/main/docs)
+- [ZeroClaw Documentation](https://github.com/zeroclaw-labs/zeroclaw/tree/main/docs)
 - [Telegram Bot Setup](https://core.telegram.org/bots)
+- [zeroclaw-ideas repo](https://github.com/jirigrill/zeroclaw-ideas) — saved research ideas
 
 ## License
 
