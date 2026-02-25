@@ -54,3 +54,7 @@ channels = ["#research", "#bitcoin", "#saas"]  # one channel = one conversation 
 allowed_users = ["YOUR_IRC_NICK"]              # your registered IRC nickname
 sasl_password = "YOUR_ZEROCLAW_IRC_PASSWORD"   # registered via setup/ergo/register-accounts.sh
 verify_tls = true                              # valid Let's Encrypt cert
+
+[integrations]
+github_token = "YOUR_GITHUB_TOKEN"    # fine-grained PAT, Contents: Read and Write scope on ideas repo
+ideas_repo = "OWNER/REPO"            # e.g. "jirigrill/zeroclaw-ideas"
